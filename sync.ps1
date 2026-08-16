@@ -17,6 +17,6 @@ git add .
 git commit -m $message
 
 # 3. Push to GitHub
-git push origin main
+git push origin master
 
 Write-Host "Sync Complete! ✨ Your research is safe." -ForegroundColor Green
