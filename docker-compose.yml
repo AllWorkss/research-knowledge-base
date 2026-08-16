@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  zenith-algo-terminal:
+    build: .
+    container_name: zenith_algo_pro
+    restart: always
+    ports:
+      - "8000:8000"
+      - "5000:5000"
+    environment:
+      - PORT=8000
+      - PYTHONUNBUFFERED=1
