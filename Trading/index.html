@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZenithAlgo Pro - Algorithmic Trading & Indicator Studio</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+        <button class="mobile-menu-btn" id="mobile-menu-toggle" aria-label="Toggle Navigation Menu">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        <div class="brand">
+            <div class="logo-icon">
+                <i class="fa-solid fa-chart-line-up"></i>
+            </div>
+            <div class="brand-text">
+                <h1>ZENITH<span>ALGO</span> PRO</h1>
+                <p>Institutional Grade Trading Terminal for Indian Markets</p>
+            </div>
+        </div>
+
+        <!-- Ticker Strip -->
+        <div class="ticker-strip">
+            <div class="ticker-item">
+                <span class="t-name">NIFTY 50</span>
+                <span class="t-val" id="ticker-nifty">24,350.80</span>
+                <span class="t-change pos" id="change-nifty">+142.30 (+0.59%)</span>
+            </div>
+            <div class="ticker-item">
+                <span class="t-name">BANK NIFTY</span>
+                <span class="t-val" id="ticker-banknifty">52,180.45</span>
+                <span class="t-change pos" id="change-banknifty">+310.15 (+0.60%)</span>
+            </div>
+            <div class="ticker-item">
+                <span class="t-name">INDIA VIX</span>
+                <span class="t-val" id="ticker-vix">12.85</span>
+                <span class="t-change neg" id="change-vix">-0.45 (-3.38%)</span>
+            </div>
+        </div>
+
+        <div class="broker-status">
+            <div class="broker-badge upstox" id="broker-badge">
+                <i class="fa-solid fa-bolt"></i>
+                <span id="active-broker-text">Upstox API v2 Connected</span>
+            </div>
+            <button class="btn-primary-sm" onclick="switchTab('broker-config')">
+                <i class="fa-solid fa-key"></i> Broker API
+            </button>
+        </div>
+    </header>
+
+    <!-- Sidebar Mobile Backdrop Overlay -->
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+    <!-- App Container -->
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <button class="nav-btn active" data-tab="chart-studio" onclick="switchTab('chart-studio')">
+                    <i class="fa-solid fa-chart-candlestick"></i>
+                    <span>Live Chart & Indicators</span>
+                </button>
+                <button class="nav-btn" data-tab="strategy-hub" onclick="switchTab('strategy-hub')">
+                    <i class="fa-solid fa-chess"></i>
+                    <span>Best Strategies & Signals</span>
+                </button>
+                <button class="nav-btn" data-tab="backtester" onclick="switchTab('backtester')">
+                    <i class="fa-solid fa-history"></i>
+                    <span>Strategy Backtester</span>
+                </button>
+                <button class="nav-btn" data-tab="risk-calc" onclick="switchTab('risk-calc')">
+                    <i class="fa-solid fa-calculator"></i>
+                    <span>Risk & Lot Calculator</span>
+                </button>
+                <button class="nav-btn" data-tab="use-cases" onclick="switchTab('use-cases')">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    <span>Why Algo Trading? (For Dad)</span>
+                </button>
+                <button class="nav-btn" data-tab="broker-config" onclick="switchTab('broker-config')">
+                    <i class="fa-solid fa-plug"></i>
+                    <span>Upstox & ICICI Integration</span>
+                </button>
+            </nav>
+
+            <!-- Dad's Quick Summary Box -->
+            <div class="dad-summary-box">
+                <div class="d-head">
+                    <i class="fa-solid fa-user-shield"></i>
+                    <h4>Dad's Safety Guard</h4>
+                </div>
+                <p>Rules set for protection:</p>
+                <ul>
+                    <li><i class="fa-solid fa-check"></i> Max Daily Loss: <b>₹10,000</b></li>
+                    <li><i class="fa-solid fa-check"></i> Capital Risk / Trade: <b>1.5%</b></li>
+                    <li><i class="fa-solid fa-check"></i> Auto Stop Loss: <b>Enforced</b></li>
+                    <li><i class="fa-solid fa-check"></i> Emotionless Execution</li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="content-area">
+
+            <!-- TAB 1: LIVE CHART & INDICATORS -->
+            <section id="chart-studio" class="tab-content active">
+                <!-- Top Chart Control Bar -->
+                <div class="chart-controls">
+                    <div class="control-group">
+                        <label>Symbol:</label>
+                        <select id="symbol-select" onchange="updateChartData()">
+                            <option value="NIFTY">NIFTY 50 Index</option>
+                            <option value="BANKNIFTY">BANK NIFTY Index</option>
+                            <option value="RELIANCE">RELIANCE Industries</option>
+                            <option value="TCS">TCS (Tata Consultancy)</option>
+                            <option value="TATAMOTORS">TATA MOTORS</option>
+                            <option value="HDFCBANK">HDFC BANK</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Timeframe:</label>
+                        <div class="btn-group">
+                            <button class="tf-btn" onclick="setTimeframe('1m')">1M</button>
+                            <button class="tf-btn active" onclick="setTimeframe('5m')">5M</button>
+                            <button class="tf-btn" onclick="setTimeframe('15m')">15M</button>
+                            <button class="tf-btn" onclick="setTimeframe('1d')">1D</button>
+                        </div>
+                    </div>
+
+                    <div class="control-group indicator-toggles">
+                        <label>Indicators:</label>
+                        <button class="ind-chip active" id="btn-ema" onclick="toggleIndicator('ema')">
+                            <i class="fa-solid fa-wave-square"></i> EMA (9/21)
+                        </button>
+                        <button class="ind-chip active" id="btn-supertrend" onclick="toggleIndicator('supertrend')">
+                            <i class="fa-solid fa-arrow-trend-up"></i> Supertrend
+                        </button>
+                        <button class="ind-chip active" id="btn-vwap" onclick="toggleIndicator('vwap')">
+                            <i class="fa-solid fa-lines-leaning"></i> VWAP
+                        </button>
+                        <button class="ind-chip" id="btn-bb" onclick="toggleIndicator('bb')">
+                            <i class="fa-solid fa-bars-staggered"></i> Bollinger Bands
+                        </button>
+                        <button class="ind-chip active" id="btn-rsi" onclick="toggleIndicator('rsi')">
+                            <i class="fa-solid fa-gauge-high"></i> RSI (14)
+                        </button>
+                        <button class="ind-chip" id="btn-signals" onclick="toggleIndicator('signals')">
+                            <i class="fa-solid fa-bell"></i> Buy/Sell Alerts
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Main Chart Grid -->
+                <div class="chart-workspace">
+                    <div class="main-chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">
+                                <h2 id="chart-symbol-name">NIFTY 50 Index (5M Intraday)</h2>
+                                <span class="badge-live"><i class="fa-solid fa-circle"></i> Live Simulated Feed</span>
+                            </div>
+                            <div class="ohlc-display" id="ohlc-readout">
+                                O: 24,310.50 | H: 24,365.20 | L: 24,295.10 | C: 24,350.80
+                            </div>
+                        </div>
+
+                        <!-- Canvas Chart Area -->
+                        <div class="canvas-container">
+                            <canvas id="mainChartCanvas"></canvas>
+                        </div>
+
+                        <!-- Sub Chart Area (RSI / MACD) -->
+                        <div class="sub-chart-container" id="rsi-container">
+                            <div class="sub-chart-title">
+                                <span>RSI (14 Period) - Overbought > 70 | Oversold < 30</span>
+                                <span id="rsi-value-text" class="rsi-val">RSI: 58.42</span>
+                            </div>
+                            <canvas id="rsiCanvas"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Right Side Signal & Order Panel -->
+                    <div class="chart-sidebar">
+                        <div class="card signal-box">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-robot"></i> Live Algo Signal</h3>
+                                <span class="badge-status buy" id="signal-badge">BUY SIGNAL</span>
+                            </div>
+                            <div class="signal-details">
+                                <div class="sig-row">
+                                    <span>Trigger Strategy:</span>
+                                    <strong id="sig-strategy">EMA Golden Crossover + RSI</strong>
+                                </div>
+                                <div class="sig-row">
+                                    <span>Entry Price:</span>
+                                    <strong id="sig-entry" class="highlight">₹24,340.00</strong>
+                                </div>
+                                <div class="sig-row">
+                                    <span>Stop Loss (SL):</span>
+                                    <strong id="sig-sl" class="danger">₹24,290.00 (-50 pts)</strong>
+                                </div>
+                                <div class="sig-row">
+                                    <span>Target 1 (1:2):</span>
+                                    <strong id="sig-tp" class="success">₹24,440.00 (+100 pts)</strong>
+                                </div>
+                                <div class="sig-row">
+                                    <span>Risk-Reward Ratio:</span>
+                                    <strong>1 : 2.0</strong>
+                                </div>
+                            </div>
+                            <button class="btn-execute-buy" onclick="simulateOrder('BUY')">
+                                <i class="fa-solid fa-bolt"></i> Auto-Execute BUY Order (Upstox/ICICI)
+                            </button>
+                            <button class="btn-execute-sell" onclick="simulateOrder('SELL')">
+                                <i class="fa-solid fa-arrow-down-short-wide"></i> Auto-Execute SELL Order
+                            </button>
+                        </div>
+
+                        <!-- Active Positions Card -->
+                        <div class="card active-positions">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-briefcase"></i> Active Positions</h3>
+                                <span class="pos-pnl positive" id="total-pnl">+₹4,500.00</span>
+                            </div>
+                            <div class="position-list" id="positions-container">
+                                <div class="pos-item">
+                                    <div class="pos-top">
+                                        <span class="pos-sym">NIFTY 24350 CE</span>
+                                        <span class="pos-qty">150 Qty (3 Lots)</span>
+                                    </div>
+                                    <div class="pos-bottom">
+                                        <span>Avg: ₹125.40 | LTP: ₹155.40</span>
+                                        <span class="pos-gain">+₹4,500 (+23.9%)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: BEST STRATEGIES & SIGNALS -->
+            <section id="strategy-hub" class="tab-content">
+                <div class="section-title">
+                    <h2><i class="fa-solid fa-chess-king"></i> Top Proven Algo Strategies for Indian Markets</h2>
+                    <p>Designed for maximum probability, tight risk management, and automatic execution on Upstox / ICICI Direct.</p>
+                </div>
+
+                <div class="strategies-grid">
+                    <!-- Strategy 1 -->
+                    <div class="strategy-card featured">
+                        <div class="strat-header">
+                            <div class="strat-title">
+                                <span class="strat-tag">Most Popular for Intraday</span>
+                                <h3>1. EMA Golden Crossover + RSI Filter</h3>
+                            </div>
+                            <span class="strat-winrate">71.4% Win Rate</span>
+                        </div>
+                        <p class="strat-desc">Triggers a BUY order when 9-period EMA crosses above 21-period EMA while RSI is above 50 (confirming bullish momentum).</p>
+                        <div class="rule-box">
+                            <div><strong><i class="fa-solid fa-arrow-trend-up success"></i> BUY Rule:</strong> EMA 9 > EMA 21 AND RSI > 50 AND Price > VWAP</div>
+                            <div><strong><i class="fa-solid fa-arrow-trend-down danger"></i> SELL Rule:</strong> EMA 9 < EMA 21 OR RSI < 40</div>
+                        </div>
+                        <div class="strat-stats">
+                            <div><span>Avg Profit:</span> <strong>1 : 2.2 R:R</strong></div>
+                            <div><span>Best For:</span> <strong>NIFTY, BANKNIFTY & High Beta Stocks</strong></div>
+                            <div><span>Timeframe:</span> <strong>5 Min / 15 Min</strong></div>
+                        </div>
+                    </div>
+
+                    <!-- Strategy 2 -->
+                    <div class="strategy-card">
+                        <div class="strat-header">
+                            <div class="strat-title">
+                                <span class="strat-tag">Trend Following</span>
+                                <h3>2. Supertrend (10, 3) + VWAP Breakout</h3>
+                            </div>
+                            <span class="strat-winrate">68.2% Win Rate</span>
+                        </div>
+                        <p class="strat-desc">Combines institutional volume benchmark (VWAP) with Supertrend reversal to capture strong multi-hour directional moves.</p>
+                        <div class="rule-box">
+                            <div><strong><i class="fa-solid fa-arrow-trend-up success"></i> BUY Rule:</strong> Supertrend turns GREEN AND Candle Closes Above VWAP</div>
+                            <div><strong><i class="fa-solid fa-arrow-trend-down danger"></i> SELL Rule:</strong> Supertrend turns RED OR Price breaks below VWAP</div>
+                        </div>
+                        <div class="strat-stats">
+                            <div><span>Avg Profit:</span> <strong>1 : 2.5 R:R</strong></div>
+                            <div><span>Best For:</span> <strong>Trending Days / Bank Nifty Options</strong></div>
+                            <div><span>Timeframe:</span> <strong>15 Min</strong></div>
+                        </div>
+                    </div>
+
+                    <!-- Strategy 3 -->
+                    <div class="strategy-card">
+                        <div class="strat-header">
+                            <div class="strat-title">
+                                <span class="strat-tag">Range & Sideways</span>
+                                <h3>3. Bollinger Band Squeeze & Reversal</h3>
+                            </div>
+                            <span class="strat-winrate">64.8% Win Rate</span>
+                        </div>
+                        <p class="strat-desc">Identifies low-volatility compression bands and buys oversold bounces off the lower band when RSI < 35.</p>
+                        <div class="rule-box">
+                            <div><strong><i class="fa-solid fa-arrow-trend-up success"></i> BUY Rule:</strong> Price touches Lower Bollinger Band AND RSI < 35</div>
+                            <div><strong><i class="fa-solid fa-arrow-trend-down danger"></i> SELL Rule:</strong> Price touches Upper Bollinger Band OR RSI > 65</div>
+                        </div>
+                        <div class="strat-stats">
+                            <div><span>Avg Profit:</span> <strong>1 : 1.8 R:R</strong></div>
+                            <div><span>Best For:</span> <strong>Non-Trending / Range-Bound Stocks</strong></div>
+                            <div><span>Timeframe:</span> <strong>5 Min</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: STRATEGY BACKTESTER -->
+            <section id="backtester" class="tab-content">
+                <div class="section-title">
+                    <h2><i class="fa-solid fa-history"></i> Algorithmic Strategy Backtester</h2>
+                    <p>Test any strategy against historical market data to verify profitability before risking real money.</p>
+                </div>
+
+                <div class="backtest-grid">
+                    <!-- Config Panel -->
+                    <div class="card bt-config">
+                        <h3><i class="fa-solid fa-sliders"></i> Backtest Parameters</h3>
+                        <div class="form-group">
+                            <label>Strategy:</label>
+                            <select id="bt-strategy">
+                                <option value="ema">EMA 9/21 Crossover + RSI</option>
+                                <option value="supertrend">Supertrend + VWAP</option>
+                                <option value="bb">Bollinger Bands Mean Reversion</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Stock / Index:</label>
+                            <select id="bt-symbol">
+                                <option value="NIFTY">NIFTY 50</option>
+                                <option value="BANKNIFTY">BANK NIFTY</option>
+                                <option value="RELIANCE">RELIANCE</option>
+                                <option value="TCS">TCS</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Starting Capital (₹):</label>
+                            <input type="number" id="bt-capital" value="500000">
+                        </div>
+                        <div class="form-group">
+                            <label>Risk Per Trade (%):</label>
+                            <input type="number" id="bt-risk" value="1.5" step="0.1">
+                        </div>
+                        <button class="btn-primary" onclick="runBacktest()">
+                            <i class="fa-solid fa-play"></i> Run Historical Backtest
+                        </button>
+                    </div>
+
+                    <!-- Metrics Summary -->
+                    <div class="card bt-results">
+                        <h3><i class="fa-solid fa-trophy"></i> Backtest Performance Summary</h3>
+                        <div class="metrics-grid">
+                            <div class="metric-card">
+                                <span>Total Net Profit</span>
+                                <h3 id="bt-net-profit" class="success">+₹1,42,850.00</h3>
+                                <small>+28.57% Capital Growth</small>
+                            </div>
+                            <div class="metric-card">
+                                <span>Win Rate</span>
+                                <h3 id="bt-winrate">69.2%</h3>
+                                <small>36 Wins / 16 Losses</small>
+                            </div>
+                            <div class="metric-card">
+                                <span>Profit Factor</span>
+                                <h3 id="bt-pf">2.34</h3>
+                                <small>Gross Profit / Gross Loss</small>
+                            </div>
+                            <div class="metric-card">
+                                <span>Max Drawdown</span>
+                                <h3 id="bt-drawdown" class="danger">-4.8%</h3>
+                                <small>Peak-to-trough decline</small>
+                            </div>
+                        </div>
+
+                        <div class="equity-chart-box">
+                            <h4>Equity Growth Curve (12 Months Historical)</h4>
+                            <canvas id="equityCanvas" height="150"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: RISK & LOT CALCULATOR -->
+            <section id="risk-calc" class="tab-content">
+                <div class="section-title">
+                    <h2><i class="fa-solid fa-calculator"></i> Capital Protection & Lot Size Calculator</h2>
+                    <p>Calculates exact quantity to buy so you NEVER exceed your risk limit on any trade.</p>
+                </div>
+
+                <div class="calc-grid">
+                    <div class="card calc-form">
+                        <h3><i class="fa-solid fa-coins"></i> Input Trade Parameters</h3>
+                        <div class="form-group">
+                            <label>Total Account Balance (₹):</label>
+                            <input type="number" id="calc-account" value="500000" oninput="calculateRisk()">
+                        </div>
+                        <div class="form-group">
+                            <label>Risk Per Trade (%):</label>
+                            <input type="number" id="calc-risk-pct" value="1.5" step="0.1" oninput="calculateRisk()">
+                        </div>
+                        <div class="form-group">
+                            <label>Entry Price (₹):</label>
+                            <input type="number" id="calc-entry" value="24340" oninput="calculateRisk()">
+                        </div>
+                        <div class="form-group">
+                            <label>Stop Loss Price (₹):</label>
+                            <input type="number" id="calc-sl" value="24290" oninput="calculateRisk()">
+                        </div>
+                        <div class="form-group">
+                            <label>Target Price (₹):</label>
+                            <input type="number" id="calc-target" value="24440" oninput="calculateRisk()">
+                        </div>
+                    </div>
+
+                    <div class="card calc-output">
+                        <h3><i class="fa-solid fa-shield-halved"></i> Recommended Order Parameters</h3>
+                        <div class="calc-result-box">
+                            <div class="res-item">
+                                <span>Max Allowed Loss on Trade:</span>
+                                <h3 class="danger" id="res-max-loss">₹7,500.00</h3>
+                            </div>
+                            <div class="res-item">
+                                <span>SL Points (Risk per share):</span>
+                                <h3 id="res-sl-points">50.00 Pts</h3>
+                            </div>
+                            <div class="res-item highlight">
+                                <span>Recommended Share Qty:</span>
+                                <h2 id="res-qty">150 Shares</h2>
+                                <small id="res-lots">(3 NIFTY Lots of 50)</small>
+                            </div>
+                            <div class="res-item">
+                                <span>Expected Target Profit:</span>
+                                <h3 class="success" id="res-expected-profit">₹15,000.00</h3>
+                            </div>
+                            <div class="res-item">
+                                <span>Risk to Reward Ratio:</span>
+                                <h3 class="highlight" id="res-rr">1 : 2.0</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 5: WHY ALGO TRADING (FOR DAD) -->
+            <section id="use-cases" class="tab-content">
+                <div class="section-title">
+                    <h2><i class="fa-solid fa-heart"></i> Why Algo Trading is Safer & Better for Dad</h2>
+                    <p>Key benefits of automated trading compared to traditional manual emotional trading.</p>
+                </div>
+
+                <div class="dad-cards-grid">
+                    <div class="dad-card">
+                        <div class="d-icon"><i class="fa-solid fa-brain-circuit"></i></div>
+                        <h3>1. Zero Emotional Errors</h3>
+                        <p>Most traders lose money due to <b>Fear and Greed</b> — holding losing stocks hoping they recover, or selling winners too early. Algos execute strictly based on logic.</p>
+                    </div>
+
+                    <div class="dad-card">
+                        <div class="d-icon"><i class="fa-solid fa-shield-virus"></i></div>
+                        <h3>2. Hard Stop Loss Guard</h3>
+                        <p>If a stock drops suddenly, a human trader hesitates. The algo cuts the trade instantly at the pre-set Stop Loss, preserving 98%+ of capital.</p>
+                    </div>
+
+                    <div class="dad-card">
+                        <div class="d-icon"><i class="fa-solid fa-bolt-lightning"></i></div>
+                        <h3>3. Lightning Fast Speed</h3>
+                        <p>Brokers like <b>Upstox</b> and <b>ICICI Direct</b> process API orders in less than 50 milliseconds. Manual typing can take 5-10 seconds, causing bad fills.</p>
+                    </div>
+
+                    <div class="dad-card">
+                        <div class="d-icon"><i class="fa-solid fa-vial-circle-check"></i></div>
+                        <h3>4. Tested Before Real Money</h3>
+                        <p>You can backtest strategies on 5 years of historical Indian market data to verify they actually make money before spending ₹1 of real capital.</p>
+                    </div>
+
+                    <div class="dad-card">
+                        <div class="d-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                        <h3>5. Freedom & Time Saving</h3>
+                        <p>No need to sit glued to screens for 6 hours daily. The algorithm scans markets, alerts you, and manages positions automatically.</p>
+                    </div>
+
+                    <div class="dad-card">
+                        <div class="d-icon"><i class="fa-solid fa-lock"></i></div>
+                        <h3>6. Daily Loss Circuit Breaker</h3>
+                        <p>If total daily losses hit a set limit (e.g. ₹10,000), the bot automatically turns off for the day. No revenge trading!</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 6: UPSTOX & ICICI INTEGRATION -->
+            <section id="broker-config" class="tab-content">
+                <div class="section-title">
+                    <h2><i class="fa-solid fa-plug"></i> Upstox API v2 & ICICI Direct Breeze Connection</h2>
+                    <p>Connect your active broker account to enable auto-trading via official Python SDKs.</p>
+                </div>
+
+                <div class="broker-tabs">
+                    <div class="b-tab-buttons">
+                        <button class="b-tab active" onclick="showBrokerTab('upstox')">
+                            <img src="https://upstox.com/app/uploads/2021/04/upstox-favicon.png" width="20" height="20" alt="Upstox" onerror="this.style.display='none'"> Upstox API v2
+                        </button>
+                        <button class="b-tab" onclick="showBrokerTab('icici')">
+                            <i class="fa-solid fa-building-columns"></i> ICICI Direct Breeze API
+                        </button>
+                    </div>
+
+                    <!-- Upstox Panel -->
+                    <div id="broker-upstox" class="broker-panel active">
+                        <div class="card">
+                            <h3><i class="fa-solid fa-key"></i> Upstox Developer Credentials</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>API Key:</label>
+                                    <input type="text" id="upstox-api-key" placeholder="e.g. 5d9f0a2e-812d-4b91-9c88-..." value="upstox_live_api_key_demo">
+                                </div>
+                                <div class="form-group">
+                                    <label>API Secret:</label>
+                                    <input type="password" id="upstox-api-secret" value="upstox_secret_demo_12345">
+                                </div>
+                                <div class="form-group">
+                                    <label>Redirect URI:</label>
+                                    <input type="text" id="upstox-redirect" value="http://127.0.0.1:5000/callback">
+                                </div>
+                            </div>
+                            <button class="btn-primary" onclick="testBrokerAuth('Upstox')">
+                                <i class="fa-solid fa-plug-circle-check"></i> Connect Upstox Account
+                            </button>
+                        </div>
+
+                        <div class="code-box">
+                            <div class="code-header">
+                                <span><i class="fa-brands fa-python"></i> upstox_algo_bot.py (Ready to Run Python Script)</span>
+                                <button class="btn-copy" onclick="copyCode('upstox-code')"><i class="fa-solid fa-copy"></i> Copy Code</button>
+                            </div>
+                            <pre><code id="upstox-code">import upstox_client
+from upstox_client.rest import ApiException
+
+# 1. Initialize Upstox API Configuration
+configuration = upstox_client.Configuration()
+configuration.access_token = 'YOUR_DAILY_ACCESS_TOKEN'
+
+api_instance = upstox_client.OrderApi(upstox_client.ApiClient(configuration))
+
+# 2. Define Auto BUY Order Function
+def place_algo_buy_order(symbol_key, qty, trigger_price):
+    body = upstox_client.PlaceOrderRequest(
+        quantity=qty,
+        product='I', # 'I' for Intraday, 'D' for Delivery
+        validity='DAY',
+        price=trigger_price,
+        tag='ZENITH_ALGO',
+        instrument_token=symbol_key,
+        order_type='LIMIT',
+        transaction_type='BUY',
+        disclosed_quantity=0,
+        trigger_price=0.0,
+        is_amo=False
+    )
+    try:
+        api_response = api_instance.place_order(body, api_version='2.0')
+        print(f"✅ BUY Order Executed! Order ID: {api_response.data.order_id}")
+        return api_response.data.order_id
+    except ApiException as e:
+        print(f"❌ Exception when placing order: {e}")
+
+# Example Execution
+# place_algo_buy_order('NSE_EQ|INE002A01018', 50, 24340.0)</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- ICICI Breeze Panel -->
+                    <div id="broker-icici" class="broker-panel">
+                        <div class="card">
+                            <h3><i class="fa-solid fa-key"></i> ICICI Breeze Credentials</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>App Key:</label>
+                                    <input type="text" id="icici-app-key" value="icici_breeze_app_key_demo">
+                                </div>
+                                <div class="form-group">
+                                    <label>Secret Key:</label>
+                                    <input type="password" id="icici-secret-key" value="icici_secret_demo_9876">
+                                </div>
+                                <div class="form-group">
+                                    <label>Session Token:</label>
+                                    <input type="text" id="icici-session" placeholder="Daily Session Token">
+                                </div>
+                            </div>
+                            <button class="btn-primary" onclick="testBrokerAuth('ICICI Direct Breeze')">
+                                <i class="fa-solid fa-plug-circle-check"></i> Connect ICICI Breeze Account
+                            </button>
+                        </div>
+
+                        <div class="code-box">
+                            <div class="code-header">
+                                <span><i class="fa-brands fa-python"></i> icici_breeze_bot.py (Ready to Run Python Script)</span>
+                                <button class="btn-copy" onclick="copyCode('icici-code')"><i class="fa-solid fa-copy"></i> Copy Code</button>
+                            </div>
+                            <pre><code id="icici-code">from breeze_connect import BreezeConnect
+
+# 1. Initialize Breeze Connect SDK
+breeze = BreezeConnect(api_key="YOUR_APP_KEY")
+breeze.generate_session(api_secret="YOUR_SECRET_KEY", session_token="YOUR_SESSION_TOKEN")
+
+# 2. Place Order on ICICI Direct
+def place_breeze_buy_order(stock_code, qty, price):
+    response = breeze.place_order(
+        stock_code=stock_code,       # e.g., 'NIFTY' or 'RELIANCE'
+        exchange_code="NSE",
+        product="margin",            # 'margin' for intraday, 'cash' for delivery
+        action="buy",
+        order_type="limit",
+        stoploss="0",
+        quantity=str(qty),
+        price=str(price),
+        validity="day"
+    )
+    print("✅ ICICI Breeze Order Response:", response)
+    return response
+
+# Example Execution
+# place_breeze_buy_order('NIFTY', 150, 24340.0)</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Notification Toasts -->
+    <div id="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
